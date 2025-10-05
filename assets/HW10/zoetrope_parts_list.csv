@@ -1,0 +1,8 @@
+﻿Name,Quantity,Component
+"U1",1,"Arduino Uno R3"
+"S1, S2",2,"Pushbutton"
+"Rpot1",1,"250 kΩ Potentiometer"
+"U2",1,"H-bridge Motor Driver"
+"M1",1,"DC Motor"
+"BAT1",1,"9V Battery"
+"R1, R2",2,"10 kΩ Resistor"
