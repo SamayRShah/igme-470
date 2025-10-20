@@ -1,0 +1,6 @@
+﻿Name,Quantity,Component
+"U1",1,"Arduino Uno R3"
+"Q1",1,"Ambient Light Sensor [Phototransistor]"
+"R1",1,"10 kΩ Resistor"
+"U2",1,"Optocoupler"
+"R2",1,"220 Ω Resistor"
