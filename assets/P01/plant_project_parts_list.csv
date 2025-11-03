@@ -1,0 +1,6 @@
+﻿Name,Quantity,Component
+"UArduino",1,"Arduino Uno R3"
+"UDisplay",1,"LCD 16 x 2"
+"RpotPotentiometer1",1,"250 kΩ Potentiometer"
+"RResistor",1,"220 Ω Resistor"
+"SENMoisture Sensor",1,"Soil Moisture Sensor"
