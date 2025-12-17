@@ -33,12 +33,13 @@
 
   <script>
     document.querySelector("#upload").onchange = handleImages;
+    document.querySelector("#imageBtn").onclick = handleImages;
 
     function handleImages(event) {
       const files = Array.from(event.target.files);
       if (!files.length) return;
 
-      // get elements
+      /* get elements */
       const preview = document.querySelector("#preview");
       const output = document.querySelector("#output");
       preview.innerHTML = "";
@@ -52,25 +53,26 @@
         reader.onload = function (e) {
           const img = new Image();
           img.onload = function () {
-            // Create a canvas per image
+            /* Create a canvas per image */
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
 
-            // parse image data and draw previews
+            /* parse image data and draw previews */
             canvas.width = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
             preview.appendChild(canvas);
 
-            // convert png to byte array
+            /* convert png to byte array */
             const rows = convertImageToRows(ctx, img.width, img.height);
 
-            // outputs in format:
-            // byte frame_x[height] {
-            //   B11111111,
-            //   B11111111,
-            //   B11111111
-            // }
+            /* outputs in format:
+             byte frame_x[height] {
+               B11111111,
+               B11111111,
+               B11111111
+             }
+          */
             finalOutput += `byte frame_${frameIndex}[${img.height}]{\n`;
             rows.forEach((row) => {
               finalOutput += ` ${row},\n`;
@@ -79,7 +81,7 @@
 
             frameIndex++;
 
-            // Update output once all images processed
+            /* Update output once all images processed */
             if (frameIndex - 1 === files.length) {
               output.textContent = finalOutput;
             }
@@ -90,15 +92,15 @@
       });
     }
 
-    // convert image to Byte row
+    /* convert image to Byte row */
     function convertImageToRows(ctx, width, height) {
       const imageData = ctx.getImageData(0, 0, width, height);
       const data = imageData.data;
       let rows = [];
 
-      // loops through all pixels in image
-      // takes transparent alpha as background and
-      // other colors as content color
+      /* loops through all pixels in image
+       takes transparent alpha as background and
+       other colors as content color */
       for (let y = 0; y < height; y++) {
         let row = "";
         for (let x = 0; x < width; x++) {
