@@ -1,116 +1,114 @@
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PNG to Byte Array Converter</title>
-    <style>
-      #preview {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-        align-items: flex-start;
-      }
-      canvas {
-        image-rendering: pixelated;
-      }
-      #output {
-        margin-top: 20px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        font-family: monospace;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>PNG to Byte Array Converter</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PNG to Byte Array Converter</title>
+  <style>
+    #preview {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      align-items: flex-start;
+    }
+    canvas {
+      image-rendering: pixelated;
+    }
+    #output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>PNG to Byte Array Converter</h1>
 
-    <input type="file" id="upload" accept="image/png" multiple />
+  <input type="file" id="upload" accept="image/png" multiple />
 
-    <!-- Image previews -->
-    <div id="preview"></div>
+  <!-- Image previews -->
+  <div id="preview"></div>
 
-    <!-- Output -->
-    <div id="output"></div>
+  <!-- Output -->
+  <div id="output"></div>
 
-    <script>
-      document.querySelector("#upload").onchange = handleImages;
+  <script>
+    document.querySelector("#upload").onchange = handleImages;
 
-      function handleImages(event) {
-        const files = Array.from(event.target.files);
-        if (!files.length) return;
+    function handleImages(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
 
-        // get elements
-        const preview = document.querySelector("#preview");
-        const output = document.querySelector("#output");
-        preview.innerHTML = "";
-        output.textContent = "";
+      // get elements
+      const preview = document.querySelector("#preview");
+      const output = document.querySelector("#output");
+      preview.innerHTML = "";
+      output.textContent = "";
 
-        let frameIndex = 1;
-        let finalOutput = "";
+      let frameIndex = 1;
+      let finalOutput = "";
 
-        files.forEach((file, i) => {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const img = new Image();
-            img.onload = function () {
-              // Create a canvas per image
-              const canvas = document.createElement("canvas");
-              const ctx = canvas.getContext("2d");
+      files.forEach((file, i) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
+            // Create a canvas per image
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
 
-              // parse image data and draw previews
-              canvas.width = img.width;
-              canvas.height = img.height;
-              ctx.drawImage(img, 0, 0);
-              preview.appendChild(canvas);
+            // parse image data and draw previews
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            preview.appendChild(canvas);
 
-              // convert png to byte array
-              const rows = convertImageToRows(ctx, img.width, img.height);
+            // convert png to byte array
+            const rows = convertImageToRows(ctx, img.width, img.height);
 
-              // outputs in format:
-              // byte frame_x[height] {
-              //   B11111111,
-              //   B11111111,
-              //   B11111111
-              // }
-              finalOutput += `byte frame_${frameIndex}[${img.height}]{\n`;
-              rows.forEach((row) => {
-                finalOutput += ` ${row},\n`;
-              });
-              finalOutput += `};\n\n`;
+            // outputs in format:
+            // byte frame_x[height] {
+            //   B11111111,
+            //   B11111111,
+            //   B11111111
+            // }
+            finalOutput += `byte frame_${frameIndex}[${img.height}]{\n`;
+            rows.forEach((row) => {
+              finalOutput += ` ${row},\n`;
+            });
+            finalOutput += `};\n\n`;
 
-              frameIndex++;
+            frameIndex++;
 
-              // Update output once all images processed
-              if (frameIndex - 1 === files.length) {
-                output.textContent = finalOutput;
-              }
-            };
-            img.src = e.target.result;
+            // Update output once all images processed
+            if (frameIndex - 1 === files.length) {
+              output.textContent = finalOutput;
+            }
           };
-          reader.readAsDataURL(file);
-        });
-      }
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
 
-      // convert image to Byte row
-      function convertImageToRows(ctx, width, height) {
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const data = imageData.data;
-        let rows = [];
+    // convert image to Byte row
+    function convertImageToRows(ctx, width, height) {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+      let rows = [];
 
-        // loops through all pixels in image
-        // takes transparent alpha as background and
-        // other colors as content color
-        for (let y = 0; y < height; y++) {
-          let row = "";
-          for (let x = 0; x < width; x++) {
-            const index = (y * width + x) * 4;
-            const alpha = data[index + 3];
-            row += alpha === 0 ? "0" : "1";
-          }
-          rows.push(`B${row}`);
+      // loops through all pixels in image
+      // takes transparent alpha as background and
+      // other colors as content color
+      for (let y = 0; y < height; y++) {
+        let row = "";
+        for (let x = 0; x < width; x++) {
+          const index = (y * width + x) * 4;
+          const alpha = data[index + 3];
+          row += alpha === 0 ? "0" : "1";
         }
-        return rows;
+        rows.push(`B${row}`);
       }
-    </script>
-  </body>
-</html>
+      return rows;
+    }
+  </script>
+</body>
